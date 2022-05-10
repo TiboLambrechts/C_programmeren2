@@ -2,16 +2,20 @@
 #include <stdlib.h>
 
 #define BMPINPUT "test.bmp"
+#define BMPOUTPUT "output.bmp"
 
 
 int main(int argc, char const *argv[])
 {
-    FILE * inputBMP = fopen(BMPINPUT, "rb");
+    FILE * inputBMP = fopen(BMPINPUT, "r");
+    FILE * outputBMP = fopen(BMPOUTPUT, "w");
     unsigned char header[54] = {0};
     signed int hoogte = 0;
     signed int breedte = 0;
     unsigned char * pixels = NULL;
+    unsigned char * pixelsnew = NULL; // worden de nieuwe pixelwaardes in opgeslagen
     int totaalAantalPixels = 0;
+
 
     if(inputBMP == NULL)
     {
@@ -28,6 +32,9 @@ int main(int argc, char const *argv[])
 
     totaalAantalPixels = breedte * hoogte;
     pixels = (unsigned char *) malloc(totaalAantalPixels*3);
+
+    pixelsnew = pixels; // ervoor zorgen dat de array van nieuwe pixels dezelfde grootte heeft
+
     if(pixels == NULL)
     {
         printf("ERROR: memory allocation Failed\n");
@@ -37,7 +44,7 @@ int main(int argc, char const *argv[])
     fread(pixels, 1, totaalAantalPixels*3, inputBMP);
     printf("INFO: Heap memory allocated = %d (bytes)\n", totaalAantalPixels*3);
 
-    //----------------------------------------
+
 
     //-------elke pixel waarde weergeven------
     int imageSize = breedte * hoogte * 3;
@@ -47,7 +54,7 @@ int main(int argc, char const *argv[])
         }
     //-----------------------------------------
 
-    //------------test smoothing------------
+    //------------test smoothing hard gecodeerd------------
 
     signed int Red_gesmooth = 0;
     signed int Blue_gesmooth = 0;
@@ -60,22 +67,38 @@ int main(int argc, char const *argv[])
     printf("De groen waarde van de gesmoothe pixel = %d\n", Green_gesmooth);
 
     Red_gesmooth = (pixels[39] + pixels[41] + pixels[44] + pixels[26] + pixels[29] + pixels[32] + pixels[14] + pixels[15] + pixels[20]) / 9;
-    printf("De groen waarde van de gesmoothe pixel = %d\n", Red_gesmooth);
+    printf("De rood waarde van de gesmoothe pixel = %d\n", Red_gesmooth);
 
-    pixels[27] = Blue_gesmooth;
-    pixels[28] = Green_gesmooth;
-    pixels[29] = Red_gesmooth;
-
-
-    fwrite(pixels, sizeof(pixels), 1, inputBMP);
+    pixelsnew[27] = Blue_gesmooth;
+    pixelsnew[28] = Green_gesmooth;
+    pixelsnew[29] = Red_gesmooth;
 
 
     //----------einde teste smooting---------
 
-    //----------------------------------------
+    int lengte_newWrite = 54 + (totaalAantalPixels * 3);
+    unsigned char newWrite[lengte_newWrite];
+
+    for(int i =0; i < 53; i++)
+    {
+        newWrite[i] = header[i];
+    }
+    for(int i =0; i < (totaalAantalPixels * 3); i++)
+    {
+        newWrite[54 + i] = pixelsnew[i];
+    }
+
+    //----------------schrijven naar bmp file------------
+     fwrite(newWrite, sizeof(newWrite), 1, outputBMP);
+
+   // fwrite(&header, sizeof(header), 1, outputBMP);
+   // fwrite(pixelsnew, sizeof(pixelsnew), 1, outputBMP);
+    //---------------------------------------------------
 
     fclose(inputBMP);
     printf("INFO: File %s CLOSED\n", BMPINPUT);
+    fclose(outputBMP);
+    printf("INFO: File %s CLOSED\n", BMPOUTPUT);
 
     free(pixels);
     printf("INFO: Heap memory Freed = %d (bytes)\n", totaalAantalPixels*3);
