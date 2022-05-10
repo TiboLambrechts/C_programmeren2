@@ -79,8 +79,8 @@ int main(int argc, char const *argv[])
     for(int i = (breedte * 3); i < ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i++)
 
     {
-        pixelsnew[i] = (pixels[i]+pixels[(i+1)]+pixels[(i-1)]+pixels[(i+(breedte * 3))]+pixels[(i+1+(breedte * 3))]+pixels[(i-1)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i+1-(breedte * 3))]+pixels[(i-1)-(breedte * 3)])/9;
-        printf("nieuwe pixel waarde is = %d\n",  pixelsnew[i]);
+        pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-3)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i+3-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/9;
+
     }
     //----------------------------------------
 
