@@ -55,6 +55,36 @@ int main(int argc, char const *argv[])
     //-----------------------------------------
 
 
+    //----------onderste rij------------------
+    int Hoeveel_Pixels_onderste_rij = (breedte * 3);
+
+    for(int i = 0; i < Hoeveel_Pixels_onderste_rij; i++)
+    {
+        pixelsnew[i] = pixels[i];
+    }
+    //----------------------------------------
+
+
+    //----------bovenste rij ------------------
+    int Hoeveel_Pixels_bovenste_rij = (breedte * 3);
+
+    for(int i = ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i < (totaalAantalPixels * 3); i++)
+    {
+        pixelsnew[i] = pixels[i];
+    }
+    //----------------------------------------
+
+
+    //------------smoothing automatisch-------
+    for(int i = (breedte * 3); i < ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i++)
+
+    {
+        pixelsnew[i] = (pixels[i]+pixels[(i+1)]+pixels[(i-1)]+pixels[(i+(breedte * 3))]+pixels[(i+1+(breedte * 3))]+pixels[(i-1)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i+1-(breedte * 3))]+pixels[(i-1)-(breedte * 3)])/9;
+        printf("nieuwe pixel waarde is = %d\n",  pixelsnew[i]);
+    }
+    //----------------------------------------
+
+/*
     //------------test smoothing hard gecodeerd------------
     signed int Red_gesmooth = 0;
     signed int Blue_gesmooth = 0;
@@ -74,7 +104,7 @@ int main(int argc, char const *argv[])
     pixelsnew[29] = Red_gesmooth;
     //----------einde teste smooting---------
 
-
+*/
     //-----------1 lijst maken van header en nieuwe pixels-----
     int lengte_newWrite = 54 + (totaalAantalPixels * 3);
     unsigned char newWrite[lengte_newWrite];
