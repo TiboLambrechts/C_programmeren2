@@ -39,11 +39,13 @@ int main(int argc, char const *argv[])
 
     //----------------------------------------
 
+    //-------elke pixel waarde weergeven------
     int imageSize = breedte * hoogte * 3;
     for(int i =0; i < imageSize-2; i+=3)
         {
             printf("pixel %d: B= %d, G=%d, R=%d\n", i, pixels[i], pixels[i+1], pixels[i+2]);
         }
+    //-----------------------------------------
 
      //------------test smoothing------------
 
