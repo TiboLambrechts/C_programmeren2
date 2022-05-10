@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
         }
     //-----------------------------------------
 
-     //------------test smoothing------------
+    //------------test smoothing------------
 
     signed int Red_gesmooth = 0;
     signed int Blue_gesmooth = 0;
