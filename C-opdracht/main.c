@@ -54,8 +54,8 @@ int main(int argc, char const *argv[])
         }
     //-----------------------------------------
 
-    //------------test smoothing hard gecodeerd------------
 
+    //------------test smoothing hard gecodeerd------------
     signed int Red_gesmooth = 0;
     signed int Blue_gesmooth = 0;
     signed int Green_gesmooth = 0;
@@ -72,10 +72,10 @@ int main(int argc, char const *argv[])
     pixelsnew[27] = Blue_gesmooth;
     pixelsnew[28] = Green_gesmooth;
     pixelsnew[29] = Red_gesmooth;
-
-
     //----------einde teste smooting---------
 
+
+    //-----------1 lijst maken van header en nieuwe pixels-----
     int lengte_newWrite = 54 + (totaalAantalPixels * 3);
     unsigned char newWrite[lengte_newWrite];
 
@@ -87,13 +87,13 @@ int main(int argc, char const *argv[])
     {
         newWrite[54 + i] = pixelsnew[i];
     }
+    //----------------------------------------------------
+
 
     //----------------schrijven naar bmp file------------
      fwrite(newWrite, sizeof(newWrite), 1, outputBMP);
-
-   // fwrite(&header, sizeof(header), 1, outputBMP);
-   // fwrite(pixelsnew, sizeof(pixelsnew), 1, outputBMP);
     //---------------------------------------------------
+
 
     fclose(inputBMP);
     printf("INFO: File %s CLOSED\n", BMPINPUT);
