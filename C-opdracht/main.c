@@ -10,11 +10,11 @@ int main(int argc, char const *argv[])
     FILE * inputBMP = fopen(BMPINPUT, "r");
     FILE * outputBMP = fopen(BMPOUTPUT, "w");
     unsigned char header[54] = {0};
-    signed int hoogte = 0;
-    signed int breedte = 0;
+    signed long hoogte = 0;
+    signed long breedte = 0;
     unsigned char * pixels = NULL;
     unsigned char * pixelsnew = NULL; // worden de nieuwe pixelwaardes in opgeslagen
-    int totaalAantalPixels = 0;
+    signed long totaalAantalPixels = 0;
 
 
     if(inputBMP == NULL)
@@ -26,9 +26,9 @@ int main(int argc, char const *argv[])
     fread(header, 1, 54, inputBMP);
 
     breedte = header[21] << 24 | header[20] << 16 | header[19] << 8 | header[18];
-    printf("De breedte van mijn afbeelding is = %d\n", breedte);
+    printf("De breedte van mijn afbeelding is = %ld\n", breedte);
     hoogte = header[25] << 24 | header[24] << 16 | header[23] << 8 | header[22];
-    printf("De hoogte van mijn afbeelding is = %d\n", hoogte);
+    printf("De hoogte van mijn afbeelding is = %ld\n", hoogte);
 
     totaalAantalPixels = breedte * hoogte;
     pixels = (unsigned char *) malloc(totaalAantalPixels*3);
@@ -42,23 +42,23 @@ int main(int argc, char const *argv[])
     }
 
     fread(pixels, 1, totaalAantalPixels*3, inputBMP);
-    printf("INFO: Heap memory allocated = %d (bytes)\n", totaalAantalPixels*3);
+    printf("INFO: Heap memory allocated = %ld (bytes)\n", totaalAantalPixels*3);
 
 
 
     //-------elke pixel waarde weergeven------
-    int imageSize = breedte * hoogte * 3;
-    for(int i =0; i < imageSize-2; i+=3)
+    signed long imageSize = breedte * hoogte * 3;
+    for(signed long i =0; i < imageSize-2; i+=3)
         {
-            printf("pixel %d: B= %d, G=%d, R=%d\n", i, pixels[i], pixels[i+1], pixels[i+2]);
+            printf("pixel %ld: B= %d, G=%d, R=%d\n", i, pixels[i], pixels[i+1], pixels[i+2]);
         }
     //-----------------------------------------
 
 
     //----------onderste rij------------------
-    int Hoeveel_Pixels_onderste_rij = (breedte * 3);
+    signed long Hoeveel_Pixels_onderste_rij = (breedte * 3);
 
-    for(int i = 0; i < Hoeveel_Pixels_onderste_rij; i++)
+    for(signed long i = 0; i < Hoeveel_Pixels_onderste_rij; i++)
     {
         pixelsnew[i] = pixels[i];
     }
@@ -66,9 +66,9 @@ int main(int argc, char const *argv[])
 
 
     //----------bovenste rij ------------------
-    int Hoeveel_Pixels_bovenste_rij = (breedte * 3);
+    signed long Hoeveel_Pixels_bovenste_rij = (breedte * 3);
 
-    for(int i = ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i < (totaalAantalPixels * 3); i++)
+    for(signed long i = ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i < (totaalAantalPixels * 3); i++)
     {
         pixelsnew[i] = pixels[i];
     }
@@ -76,7 +76,7 @@ int main(int argc, char const *argv[])
 
 
     //------------smoothing automatisch-------
-    for(int i = (breedte * 3); i < ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i++)
+    for(signed long i = (breedte * 3); i < ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i++)
 
     {
         pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-3)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i+3-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/9;
@@ -105,14 +105,14 @@ int main(int argc, char const *argv[])
 
 */
     //-----------1 lijst maken van header en nieuwe pixels-----
-    int lengte_newWrite = 54 + (totaalAantalPixels * 3);
+    signed long lengte_newWrite = 54 + (totaalAantalPixels * 3);
     unsigned char newWrite[lengte_newWrite];
 
-    for(int i =0; i < 53; i++)
+    for(signed long i =0; i < 53; i++)
     {
         newWrite[i] = header[i];
     }
-    for(int i =0; i < (totaalAantalPixels * 3); i++)
+    for(signed long i =0; i < (totaalAantalPixels * 3); i++)
     {
         newWrite[54 + i] = pixelsnew[i];
     }
@@ -130,6 +130,6 @@ int main(int argc, char const *argv[])
     printf("INFO: File %s CLOSED\n", BMPOUTPUT);
 
     free(pixels);
-    printf("INFO: Heap memory Freed = %d (bytes)\n", totaalAantalPixels*3);
+    printf("INFO: Heap memory Freed = %ld (bytes)\n", totaalAantalPixels*3);
     return 0;
 }
