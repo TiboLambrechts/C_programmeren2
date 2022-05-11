@@ -7,14 +7,14 @@
 
 int main(int argc, char const *argv[])
 {
-    FILE * inputBMP = fopen(BMPINPUT, "r");
+    FILE * inputBMP = fopen(BMPINPUT, "rb");
     FILE * outputBMP = fopen(BMPOUTPUT, "w");
     unsigned char header[54] = {0};
     signed long hoogte = 0;
     signed long breedte = 0;
     unsigned char * pixels = NULL;
     unsigned char * pixelsnew = NULL; // worden de nieuwe pixelwaardes in opgeslagen
-    signed long totaalAantalPixels = 0;
+    long totaalAantalPixels = 0;
 
 
     if(inputBMP == NULL)
@@ -46,6 +46,9 @@ int main(int argc, char const *argv[])
 
 
 
+
+
+
     //-------elke pixel waarde weergeven------
     signed long imageSize = breedte * hoogte * 3;
     for(signed long i =0; i < imageSize-2; i+=3)
@@ -54,8 +57,14 @@ int main(int argc, char const *argv[])
         }
     //-----------------------------------------
 
+
+
     signed long Hoeveel_Pixels_bovenste_rij = (breedte * 3);
     signed long Hoeveel_Pixels_onderste_rij = (breedte * 3);
+
+
+
+
 
     /*//----------onderste rij niet smoothen------------------
     signed long Hoeveel_Pixels_onderste_rij = (breedte * 3);
@@ -65,21 +74,10 @@ int main(int argc, char const *argv[])
         pixelsnew[i] = pixels[i];
     }
     *///----------------------------------------
-
     //------om de onderste rij te smoothen houd ik enkel rekening met de pixels erlangs en erboven. We kunnen niet kijken naar de rij eronder want die is er niet-------------
     for(signed long i = 3; i < Hoeveel_Pixels_onderste_rij; i++)
     {
         pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-3)+(breedte * 3)])/6;
-    }
-
-    //----------------------------------------
-
-
-    //------------smoothing automatisch-------
-    for(signed long i = (breedte * 3); i < ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i++)
-
-    {
-        pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-3)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i+3-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/9;
     }
     //----------------------------------------
 
@@ -92,14 +90,42 @@ int main(int argc, char const *argv[])
         pixelsnew[i] = pixels[i];
     }
     *///----------------------------------------
-
     //------om de bovenste rij te smoothen houd ik enkel rekening met de pixels erlangs en eronder. We kunnen niet kijken naar de rij er boven want die is er niet-------------
-    for(signed long i = ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i < ((totaalAantalPixels * 3)-3); i++)
+    for(signed long i = ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i < ((totaalAantalPixels * 3)); i++)
     {
         pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i-(breedte * 3))]+pixels[(i+3-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/6;
     }
     //----------------------------------------
 
+
+   /* //------------smoothing automatisch-------
+    for(signed long i = (breedte * 3); i < ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i++)
+
+    {
+        pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-3)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i+3-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/9;
+    }
+    *///----------------------------------------
+
+    //--------------smoothing automatisch zonder zijkanten----------
+    for(signed long i = (breedte * 3); i < ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i++)
+
+    {
+        if ((i / (breedte * 3) == 1) || ((i-1) / (breedte * 3) == 1) || ((i-2) / (breedte * 3) == 1))
+        {
+            pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-(breedte * 3))]+pixels[(i+3-(breedte * 3))])/6;
+        }
+
+        else if (((i+3) / (breedte * 3) == 1) || ((i+2) / (breedte * 3) == 1) || ((i+1) / (breedte * 3) == 1))
+        {
+            pixelsnew[i] = (pixels[i]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i-3)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/9;
+        }
+
+        else
+        {
+            pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-3)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i+3-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/9;
+        }
+    }
+    //---------------------------------------------------------------
 
 /*
     //------------test smoothing hard gecodeerd------------
