@@ -55,25 +55,44 @@ int main(int argc, char const *argv[])
     //-----------------------------------------
 
 
-    //----------onderste rij------------------
+    /*//----------onderste rij niet smoothen------------------
     signed long Hoeveel_Pixels_onderste_rij = (breedte * 3);
 
     for(signed long i = 0; i < Hoeveel_Pixels_onderste_rij; i++)
     {
         pixelsnew[i] = pixels[i];
     }
+    *///----------------------------------------
+
+    //------om de onderste rij te smoothen houd ik enkel rekening met de pixels erlangs en erboven. We kunnen niet kijken naar de rij eronder want die is er niet-------------
+    signed long Hoeveel_Pixels_onderste_rij = (breedte * 3);
+
+    for(signed long i = 3; i < Hoeveel_Pixels_onderste_rij; i++)
+    {
+        pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-3)+(breedte * 3)])/6;
+    }
+
     //----------------------------------------
 
 
-    //----------bovenste rij ------------------
+    /*//----------bovenste rij niet smoothen------------------
     signed long Hoeveel_Pixels_bovenste_rij = (breedte * 3);
 
     for(signed long i = ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i < (totaalAantalPixels * 3); i++)
     {
         pixelsnew[i] = pixels[i];
     }
-    //----------------------------------------
+    *///----------------------------------------
 
+    //------om de bovenste rij te smoothen houd ik enkel rekening met de pixels erlangs en eronder. We kunnen niet kijken naar de rij er boven want die is er niet-------------
+    signed long Hoeveel_Pixels_bovenste_rij = (breedte * 3);
+
+    for(signed long i = ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i < ((totaalAantalPixels * 3)-3); i++)
+    {
+        pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i-(breedte * 3))]+pixels[(i+3-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/6;
+    }
+
+    //----------------------------------------
 
     //------------smoothing automatisch-------
     for(signed long i = (breedte * 3); i < ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i++)
