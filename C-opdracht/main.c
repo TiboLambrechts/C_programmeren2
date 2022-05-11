@@ -117,7 +117,7 @@ int main(int argc, char const *argv[])
 
         else if (((i+3) / (breedte * 3) == 1) || ((i+2) / (breedte * 3) == 1) || ((i+1) / (breedte * 3) == 1))
         {
-            pixelsnew[i] = (pixels[i]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i-3)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/9;
+            pixelsnew[i] = (pixels[i]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i-3)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/6;
         }
 
         else
@@ -152,7 +152,7 @@ int main(int argc, char const *argv[])
     signed long lengte_newWrite = 54 + (totaalAantalPixels * 3);
     unsigned char newWrite[lengte_newWrite];
 
-    for(signed long i =0; i < 53; i++)
+    for(signed long i =0; i < 54; i++)
     {
         newWrite[i] = header[i];
     }
@@ -174,6 +174,8 @@ int main(int argc, char const *argv[])
     printf("INFO: File %s CLOSED\n", BMPOUTPUT);
 
     free(pixels);
+
     printf("INFO: Heap memory Freed = %ld (bytes)\n", totaalAantalPixels*3);
     return 0;
+    free(pixelsnew);
 }
