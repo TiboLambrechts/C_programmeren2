@@ -13,6 +13,8 @@ int main(int argc, char const *argv[])
 {
     FILE * inputBMP = fopen(BMPINPUT, "rb");
     FILE * outputBMP = fopen(BMPOUTPUT, "wb");
+    FILE * outputBMPINV = fopen(BMPOUTPUTINV, "wb");
+
     unsigned char header[54] = {0};
     signed long hoogte = 0;
     signed long breedte = 0;
@@ -144,8 +146,15 @@ int main(int argc, char const *argv[])
     pixelsnew[27] = Blue_gesmooth;
     pixelsnew[28] = Green_gesmooth;
     pixelsnew[29] = Red_gesmooth;
-    //----------einde teste smooting---------
+    //-----------------------------------------------------
 */
+    //-------------------kleuren inverteren----------------
+    for(signed long i = 0; i < (totaalAantalPixels*3); i++)
+    {
+        pixelsnewInv[i] = 255 - pixels[i];
+    }
+    //-----------------------------------------------------
+
 
     //-----------1 lijst maken van header en nieuwe pixels-----
     signed long lengte_newWrite = 54 + (totaalAantalPixels * 3);
@@ -161,17 +170,22 @@ int main(int argc, char const *argv[])
         newWrite[54 + i] = pixelsnew[i];
     }
     //----------------------------------------------------
+    signed long lengte_newWriteInv = 54 + (totaalAantalPixels * 3);
+    unsigned char newWriteInv[lengte_newWriteInv];
 
-    //-------elke pixel waarde weergeven------
+    for(signed long i =0; i < 55; i++)
+    {
+        newWriteInv[i] = header[i];
+    }
 
-    for(signed long i =0; i < imageSize-2; i+=3)
-        {
-            printf("pixelnew %ld: B= %d, G=%d, R=%d\n", i, pixelsnew[i], pixelsnew[i+1], pixelsnew[i+2]);
-        }
-    //-----------------------------------------
+    for(signed long i =0; i < (totaalAantalPixels * 3); i++)
+    {
+        newWriteInv[54 + i] = pixelsnewInv[i];
+    }
 
-    //----------------schrijven naar bmp file------------
+    //----------------schrijven naar bmp files------------
      fwrite(newWrite, lengte_newWrite, 1, outputBMP);
+     fwrite(newWriteInv, lengte_newWriteInv, 1, outputBMPINV);
     //---------------------------------------------------
 
 
@@ -179,6 +193,9 @@ int main(int argc, char const *argv[])
     printf("INFO: File %s CLOSED\n", BMPINPUT);
     fclose(outputBMP);
     printf("INFO: File %s CLOSED\n", BMPOUTPUT);
+    fclose(outputBMPINV);
+    printf("INFO: File %s CLOSED\n", BMPOUTPUTINV);
+
 
     free(pixels);
     free(pixelsnew);
