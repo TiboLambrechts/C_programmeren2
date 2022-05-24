@@ -14,6 +14,7 @@ int main(int argc, char const *argv[])
     FILE * inputBMP = fopen(BMPINPUT, "rb");
     FILE * outputBMP = fopen(BMPOUTPUT, "wb");
     FILE * outputBMPINV = fopen(BMPOUTPUTINV, "wb");
+    FILE * outputBMPZW = fopen(BMPOUTPUTZW, "wb");
 
     unsigned char header[54] = {0};
     signed long hoogte = 0;
@@ -155,6 +156,26 @@ int main(int argc, char const *argv[])
     }
     //-----------------------------------------------------
 
+    //---------------------zwart wit-----------------------
+    int blauw = 0;
+    int groen = 0;
+    int rood = 0;
+    int ZwWaarde = 0;
+
+    for(signed long i = 0; i < (totaalAantalPixels*3); i = i+3)
+    {
+        blauw = pixels[i];
+        groen = pixels[i+1];
+        rood = pixels[i+2];
+
+        ZwWaarde = (blauw + groen + rood)/3;
+
+        pixelsnewZw[i] = ZwWaarde;
+        pixelsnewZw[i+1] = ZwWaarde;
+        pixelsnewZw[i+2] = ZwWaarde;
+    }
+
+    //-----------------------------------------------------
 
     //-----------1 lijst maken van header en nieuwe pixels-----
     signed long lengte_newWrite = 54 + (totaalAantalPixels * 3);
@@ -182,10 +203,26 @@ int main(int argc, char const *argv[])
     {
         newWriteInv[54 + i] = pixelsnewInv[i];
     }
+    //------------------------------------------------------------
+    signed long lengte_newWriteZw = 54 + (totaalAantalPixels * 3);
+    unsigned char newWriteZw[lengte_newWriteZw];
+
+    for(signed long i =0; i < 55; i++)
+    {
+        newWriteZw[i] = header[i];
+    }
+
+    for(signed long i =0; i < (totaalAantalPixels * 3); i++)
+    {
+        newWriteZw[54 + i] = pixelsnewZw[i];
+    }
+
+    //------------------------------------------------------------
 
     //----------------schrijven naar bmp files------------
      fwrite(newWrite, lengte_newWrite, 1, outputBMP);
      fwrite(newWriteInv, lengte_newWriteInv, 1, outputBMPINV);
+     fwrite(newWriteZw, lengte_newWriteZw, 1, outputBMPZW);
     //---------------------------------------------------
 
 
@@ -193,8 +230,8 @@ int main(int argc, char const *argv[])
     printf("INFO: File %s CLOSED\n", BMPINPUT);
     fclose(outputBMP);
     printf("INFO: File %s CLOSED\n", BMPOUTPUT);
-    fclose(outputBMPINV);
-    printf("INFO: File %s CLOSED\n", BMPOUTPUTINV);
+    fclose(outputBMPZW);
+    printf("INFO: File %s CLOSED\n", BMPOUTPUTZW);
 
 
     free(pixels);
