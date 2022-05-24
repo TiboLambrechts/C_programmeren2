@@ -2,18 +2,24 @@
 #include <stdlib.h>
 
 #define BMPINPUT "test.bmp"
-#define BMPOUTPUT "output.bmp"
+#define BMPOUTPUT "outputSmoothing.bmp"
+#define BMPOUTPUTZW "outputZW.bmp"
+#define BMPOUTPUTINV "outpuINV.bmp"
+
+
 
 
 int main(int argc, char const *argv[])
 {
     FILE * inputBMP = fopen(BMPINPUT, "rb");
-    FILE * outputBMP = fopen(BMPOUTPUT, "w");
+    FILE * outputBMP = fopen(BMPOUTPUT, "wb");
     unsigned char header[54] = {0};
     signed long hoogte = 0;
     signed long breedte = 0;
     unsigned char * pixels = NULL;
     unsigned char * pixelsnew = NULL; // worden de nieuwe pixelwaardes in opgeslagen
+    unsigned char * pixelsnewZw = NULL;
+    unsigned char * pixelsnewInv = NULL;
     long totaalAantalPixels = 0;
 
 
@@ -33,7 +39,12 @@ int main(int argc, char const *argv[])
     totaalAantalPixels = breedte * hoogte;
     pixels = (unsigned char *) malloc(totaalAantalPixels*3);
 
-    pixelsnew = pixels; // ervoor zorgen dat de array van nieuwe pixels dezelfde grootte heeft
+    pixelsnew = (unsigned char *) malloc(totaalAantalPixels*3); // ervoor zorgen dat de array van nieuwe pixels dezelfde grootte heeft
+    pixelsnewZw = (unsigned char *) malloc(totaalAantalPixels*3); // ervoor zorgen dat de array van nieuwe pixels dezelfde grootte heeft
+    pixelsnewInv = (unsigned char *) malloc(totaalAantalPixels*3); // ervoor zorgen dat de array van nieuwe pixels dezelfde grootte heeft
+
+    signed long Hoeveel_Pixels_bovenste_rij = (breedte * 3);
+    signed long Hoeveel_Pixels_onderste_rij = (breedte * 3);
 
     if(pixels == NULL)
     {
@@ -41,12 +52,8 @@ int main(int argc, char const *argv[])
         return -2;
     }
 
-    fread(pixels, 1, totaalAantalPixels*3, inputBMP);
+    fread(pixels, 1, (totaalAantalPixels*3), inputBMP);
     printf("INFO: Heap memory allocated = %ld (bytes)\n", totaalAantalPixels*3);
-
-
-
-
 
 
     //-------elke pixel waarde weergeven------
@@ -57,15 +64,6 @@ int main(int argc, char const *argv[])
         }
     //-----------------------------------------
 
-
-
-    signed long Hoeveel_Pixels_bovenste_rij = (breedte * 3);
-    signed long Hoeveel_Pixels_onderste_rij = (breedte * 3);
-
-
-
-
-
     /*//----------onderste rij niet smoothen------------------
     signed long Hoeveel_Pixels_onderste_rij = (breedte * 3);
 
@@ -74,13 +72,13 @@ int main(int argc, char const *argv[])
         pixelsnew[i] = pixels[i];
     }
     *///----------------------------------------
+
     //------om de onderste rij te smoothen houd ik enkel rekening met de pixels erlangs en erboven. We kunnen niet kijken naar de rij eronder want die is er niet-------------
     for(signed long i = 3; i < Hoeveel_Pixels_onderste_rij; i++)
     {
         pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-3)+(breedte * 3)])/6;
     }
     //----------------------------------------
-
 
     /*//----------bovenste rij niet smoothen------------------
     signed long Hoeveel_Pixels_bovenste_rij = (breedte * 3);
@@ -90,6 +88,8 @@ int main(int argc, char const *argv[])
         pixelsnew[i] = pixels[i];
     }
     *///----------------------------------------
+
+
     //------om de bovenste rij te smoothen houd ik enkel rekening met de pixels erlangs en eronder. We kunnen niet kijken naar de rij er boven want die is er niet-------------
     for(signed long i = ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i < ((totaalAantalPixels * 3)); i++)
     {
@@ -104,11 +104,10 @@ int main(int argc, char const *argv[])
     {
         pixelsnew[i] = (pixels[i]+pixels[(i+3)]+pixels[(i-3)]+pixels[(i+(breedte * 3))]+pixels[(i+3+(breedte * 3))]+pixels[(i-3)+(breedte * 3)]+pixels[(i-(breedte * 3))]+pixels[(i+3-(breedte * 3))]+pixels[(i-3)-(breedte * 3)])/9;
     }
-    *///----------------------------------------
+   */ //----------------------------------------
 
     //--------------smoothing automatisch zonder zijkanten----------
     for(signed long i = (breedte * 3); i < ((totaalAantalPixels * 3) - Hoeveel_Pixels_bovenste_rij); i++)
-
     {
         if ((i / (breedte * 3) == 1) || ((i-1) / (breedte * 3) == 1) || ((i-2) / (breedte * 3) == 1))
         {
@@ -146,25 +145,33 @@ int main(int argc, char const *argv[])
     pixelsnew[28] = Green_gesmooth;
     pixelsnew[29] = Red_gesmooth;
     //----------einde teste smooting---------
-
 */
+
     //-----------1 lijst maken van header en nieuwe pixels-----
     signed long lengte_newWrite = 54 + (totaalAantalPixels * 3);
     unsigned char newWrite[lengte_newWrite];
 
-    for(signed long i =0; i < 54; i++)
+    for(signed long i =0; i < 55; i++)
     {
         newWrite[i] = header[i];
     }
+
     for(signed long i =0; i < (totaalAantalPixels * 3); i++)
     {
         newWrite[54 + i] = pixelsnew[i];
     }
     //----------------------------------------------------
 
+    //-------elke pixel waarde weergeven------
+
+    for(signed long i =0; i < imageSize-2; i+=3)
+        {
+            printf("pixelnew %ld: B= %d, G=%d, R=%d\n", i, pixelsnew[i], pixelsnew[i+1], pixelsnew[i+2]);
+        }
+    //-----------------------------------------
 
     //----------------schrijven naar bmp file------------
-     fwrite(newWrite, sizeof(newWrite), 1, outputBMP);
+     fwrite(newWrite, lengte_newWrite, 1, outputBMP);
     //---------------------------------------------------
 
 
@@ -174,8 +181,8 @@ int main(int argc, char const *argv[])
     printf("INFO: File %s CLOSED\n", BMPOUTPUT);
 
     free(pixels);
+    free(pixelsnew);
 
     printf("INFO: Heap memory Freed = %ld (bytes)\n", totaalAantalPixels*3);
     return 0;
-    free(pixelsnew);
 }
