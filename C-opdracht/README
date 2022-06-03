@@ -4,3 +4,6 @@ C-programmeren 2
 Smoothing filter
 Zwart wit filter
 Kleuren invertor filter
+
+Werkt enkel bij 4*4, 16*16, 20x20, 24x24,...,100x100,...
+enkel veelvouden van 4
